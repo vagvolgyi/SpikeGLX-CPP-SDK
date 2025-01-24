@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import time
 import sglx as sglx
 from ctypes import byref, POINTER, c_int, c_short, c_bool, c_char_p
 
 # Edit the server address/port here
-sglx_addr = "localhost"
+sglx_addr = "10.163.95.72"
 sglx_port = 4142
 
 
@@ -16,6 +17,28 @@ def justConnect():
     if sglx.c_sglx_connect( hSglx, sglx_addr.encode(), sglx_port ):
         print( "version <{}>\n".format( sglx.c_sglx_getVersion( hSglx ) ) )
     else:
+        print( "error [{}]\n".format( sglx.c_sglx_getError( hSglx ) ) )
+
+    sglx.c_sglx_close( hSglx )
+    sglx.c_sglx_destroyHandle( hSglx )
+
+
+# Set recording.
+#
+def setRecording(enable):
+    print( "\Set recording...\n\n" )
+    hSglx = sglx.c_sglx_createHandle()
+    ok    = sglx.c_sglx_connect( hSglx, sglx_addr.encode(), sglx_port )
+
+    if ok:
+        ok = sglx.c_sglx_setRecordingEnable(hSglx, enable)
+        if ok:
+            if enable:
+                print( "Recording started\n" )
+            else:
+                print( "Recording stopped\n" )
+
+    if not ok:
         print( "error [{}]\n".format( sglx.c_sglx_getError( hSglx ) ) )
 
     sglx.c_sglx_close( hSglx )
@@ -198,7 +221,7 @@ def plot_NI_1sec_test():
                     for i in range(0, spc):
                         s += ' '
                     s += '*'
-                    print( f"{s}" )
+                    print( "{}".format(s) )
 
     if not ok:
         print( "error [{}]\n".format( sglx.c_sglx_getError( hSglx ) ) )
@@ -286,6 +309,9 @@ def latency_test():
 
 
 if __name__ == "__main__":
-    justConnect()
-
+#    justConnect()
+#    getParams_test()
+    setRecording(True)
+    time.sleep(5)
+    setRecording(False)
 
